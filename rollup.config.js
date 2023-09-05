@@ -11,7 +11,7 @@ const resolveFile = function (filePath) {
     return path.join(__dirname, filePath)
 }
 
-const pluginName = 'single-spa-test'
+const pluginName = 'mini-single-spa'
 function getOptions(mode) {
     const result = {
         input: resolveFile('src/index.ts'),

@@ -1,6 +1,6 @@
 import bootstrapApp from "../lifeCycles/bootstrap";
 import mountApp from "../lifeCycles/mount";
-import unMountApp from "../lifeCycles/unmount";
+import unMountApp from "../lifeCycles/unMount";
 import { Application, AppStatus } from "../types";
 
 export const apps: Application[] = []

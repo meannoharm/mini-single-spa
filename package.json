@@ -1,5 +1,5 @@
 {
-  "name": "single-spa-test",
+  "name": "mini-single-spa",
   "version": "0.0.0",
   "description": "mini-single-spa",
   "main": "dist/mini-single-spa.cjs.js",
@@ -36,8 +36,10 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-cypress": "^2.11.2",
     "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "husky": "^4.3.0",
     "lint-staged": "^10.5.4",
+    "prettier": "^3.0.3",
     "rimraf": "^3.0.2",
     "rollup": "^2.64.0",
     "rollup-plugin-typescript2": "^0.31.1",

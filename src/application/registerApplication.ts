@@ -1,7 +1,7 @@
 import { AppStatus, Application } from "src/types";
-import { apps } from "./app";
+import { apps } from "./apps";
 
-export function registerApplication(app: Application) {
+export default function registerApplication(app: Application) {
   if (typeof app.activeRule === "string") {
     const path = app.activeRule;
     app.activeRule = (location: Location = window.location) => location.pathname === path;
