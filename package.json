@@ -10,12 +10,6 @@
     "build": "rimraf dist && rollup -c rollup.config.js --environment NODE_ENV:production",
     "dev": "rimraf dist && rollup -c rollup.config.js --environment NODE_ENV:development"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "FORCE_COLOR=1 node scripts/verify-commit.js"
-    }
-  },
   "lint-staged": {
     "src/**/*.{js,ts}": "eslint"
   },
