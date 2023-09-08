@@ -17,11 +17,20 @@ export enum AppStatus {
 export interface Application {
   name: string
   activeRule: Function | string
-  loadApp: () => Promise<any>
   props: AnyObject | Function
+  pageEntry: string
+  pageBody: string
+  loadedURLs: string[]
   status?: AppStatus
-  container?: HTMLElement
+  container: HTMLElement
   bootstrap?: (props: AnyObject) => Promise<any>
   mount?: (props: AnyObject) => Promise<any>
   unMount?: (props: AnyObject) => Promise<any>
+}
+
+export interface Source {
+  isGlobal: boolean
+  url?: string
+  value: string;
+  type?: string | null;
 }
