@@ -4,7 +4,7 @@ import { Application, AppStatus } from "src/types";
 export default function unMountApp(app: Application): Promise<any> {
   app.status = AppStatus.BEFORE_UNMOUNT;
 
-  let result = (app as any).unMount(app.props);
+  let result = (app as any).unMount({props: app.props, container: app.container});
   if (!isPromise(result)) {
     result = Promise.resolve(result);
   }

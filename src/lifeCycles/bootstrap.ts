@@ -1,8 +1,17 @@
 import { isPromise } from "src/utils/utils";
 import { AnyObject, Application, AppStatus } from "../types";
+import parseHTMLandLoadSources from "src/utils/parseHtmlAndLoadSources";
+
+declare const window: any;
 
 export default async function bootstrapApp(app: Application) {
-  const { bootstrap, mount, unMount } = await app.loadApp();
+  try {
+    await parseHTMLandLoadSources(app);
+  } catch (error) {
+    throw error
+  }
+
+  const { bootstrap, mount, unMount } = await getLifeCycleFuncs(app.name);
 
   validateLifeCycleFunc("bootstrap", bootstrap);
   validateLifeCycleFunc("mount", mount);
@@ -46,4 +55,17 @@ function validateLifeCycleFunc(name: string, fn: any) {
   if (typeof fn !== "function") {
     throw Error(`The "${name}" must be a function`);
   }
+}
+
+async function getLifeCycleFuncs(name: string) {
+  const result = window[`mini-single-spa-${name}`]
+  if (typeof result === 'function') {
+    return result();
+  }
+
+  if (typeof result === 'object') {
+    return result;
+  }
+
+  throw Error(`The micro app must inject the lifecycle("bootstrap" "mount" "unmount") into window['mini-single-spa-${name}']`)
 }
