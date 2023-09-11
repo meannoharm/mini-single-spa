@@ -33,7 +33,7 @@ export async function mount(options) {
     render(options)
 }
 
-export async function unmount() {
+export async function unMount() {
     app.$destroy()
     app.$el.innerHTML = ''
     app = null
@@ -44,7 +44,7 @@ if (window.__IS_SINGLE_SPA__) {
     window['mini-single-spa-vue'] = {
         bootstrap,
         mount,
-        unmount
+        unMount
     }
 } else {
     render()

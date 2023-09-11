@@ -18,7 +18,7 @@ export async function mount(options) {
   render(options);
 }
 
-export async function unmount(options) {
+export async function unMount(options) {
   const { container } = options;
   ReactDOM.unmountComponentAtNode(container ? container.querySelector('#root') : document.querySelector('#root'));
 }
@@ -27,7 +27,7 @@ if (window.__IS_SINGLE_SPA__) {
   window['mini-single-spa-react'] = {
     bootstrap,
     mount,
-    unmount
+    unMount
   }
 } else {
   render()
