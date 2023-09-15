@@ -74,16 +74,15 @@ function extractScriptsAndStyle(node: Document | Element, app: Application) {
     } else if (tagName === 'SCRIPT') {
       removeNode(child);
       const src = child.getAttribute('src') || '';
+      console.log(child)
       if (app.loadedURLs.includes(src) || globalLoadedURLs.includes(src)) {
         continue;
       }
-
       const config: Source = {
         isGlobal,
         type: child.getAttribute('type'),
         value: child.textContent || '',
       };
-
       if (src) {
         config.url = src;
         if (isGlobal) {
