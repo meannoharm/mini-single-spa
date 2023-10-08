@@ -12,7 +12,15 @@ import {
   originalQuerySelector,
   originalQuerySelectorAll,
 } from 'src/utils/originalEnv';
+import {
+  globalLoadedURLs,
+  fetchScriptAndExecute,
+  executeScripts,
+  fetchStyleAndReplaceStyleContent,
+} from '../utils/source';
 
+// 对document有关的方法进行代理
+// 使其作用范围在子应用的dom范围内
 export function patchDocument() {
   Element.prototype.appendChild = function appendChild<T extends Node>(node: T): any {
     return patchAddChild(this, node, null, 'append');
@@ -109,6 +117,48 @@ function patchAddChild(parent: Node, child: any, referenceNode: Node | null, typ
   const appName = child.getAttribute('single-spa-name');
   const app = getApp(appName);
   if (!appName || !app) return addChild(parent, child, referenceNode, type);
+
+  if (tagName === 'STYLE') {
+    // if (app.sandboxConfig.css) {
+
+    // }
+    return addChild(head, child, referenceNode, type);
+  }
+
+  if (tagName === 'SCRIPT') {
+    const src = child.src;
+    if (src && !globalLoadedURLs.includes(src) && !app.loadedURLs.includes(src)) {
+      if (child.getAttribute('global')) {
+        globalLoadedURLs.push(src);
+      } else {
+        app.loadedURLs.push(src);
+      }
+
+      fetchScriptAndExecute(src, app);
+    }
+    executeScripts([child.textContent], app);
+  }
+
+  if (
+    child.rel === 'stylesheet' &&
+    child.href &&
+    !globalLoadedURLs.includes(child.href) &&
+    !app.loadedURLs.includes(child.href)
+  ) {
+    const href = child.href;
+    if (child.getAttribute('global')) {
+      globalLoadedURLs.push(href);
+    } else {
+      app.loadedURLs.push(href);
+    }
+
+    const style = document.createElement('link');
+    style.setAttribute('type', 'text/css');
+
+    fetchStyleAndReplaceStyleContent(style, href);
+
+    return addChild(head, style, referenceNode, type);
+  }
 }
 
 function addChild(parent: Node, child: any, referenceNode: Node | null, type: 'append' | 'insert') {

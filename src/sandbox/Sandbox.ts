@@ -7,10 +7,18 @@ import {
   originalEval,
   originalDocument,
   originalDefineProperty,
+  originalDocumentAddEventListener,
 } from 'src/utils/originalEnv';
 import { getEventTypes } from '../utils/dom';
 import { temporarySetCurrentAppName } from '../utils/application';
 import { isFunction } from '../utils/utils';
+import { patchDocument, releaseDocument } from './patchDocument';
+import {
+  releaseAppDocumentEvents,
+  patchDocumentEvents,
+  releaseDocumentEvents,
+  documentEventMap,
+} from './patchDocumentEvents';
 
 export type MicroWindow = Window & any;
 
@@ -56,7 +64,7 @@ export default class Sandbox {
     this.active = true;
     if (++Sandbox.activeCount === 1) {
       patchDocument();
-      patchDocumentEvent();
+      patchDocumentEvents();
     }
   }
 
@@ -106,6 +114,65 @@ export default class Sandbox {
       releaseDocument();
       releaseDocumentEvents();
     }
+  }
+
+  // 记录子应用快照
+  recordWindowSnapshot() {
+    const { windowSnapshot, microAppWindow } = this;
+    const recordAttrs = windowSnapshot.get('attrs')!;
+    const recordWindowEvents = windowSnapshot.get('onWindowEvents')!;
+    const recordOnWindowEvents = windowSnapshot.get('onWindowEvents')!;
+    const recordDocumentEvents = windowSnapshot.get('documentEvents')!;
+
+    this.injectKeySet.forEach((key) => {
+      recordAttrs.set(key, deepCopy(microAppWindow[key]));
+    });
+
+    this.windowEventMap.forEach((arr, type) => {
+      recordWindowEvents.set(type, deepCopy(arr));
+    });
+
+    this.onWindowEventMap.forEach((func, type) => {
+      recordOnWindowEvents.set(type, func);
+    });
+
+    documentEventMap.get(this.appName)?.forEach((arr: any[], type: string) => {
+      recordDocumentEvents.set(type, deepCopy(arr));
+    });
+  }
+
+  // 恢复子应用快照
+  restoreWindowSnapshot() {
+    const { windowSnapshot, injectKeySet, microAppWindow, windowEventMap, onWindowEventMap } = this;
+    const recordAttrs = windowSnapshot.get('attrs')!;
+    const recordWindowEvents = windowSnapshot.get('windowEvents')!;
+    const recordOnWindowEvents = windowSnapshot.get('onWindowEvents')!;
+    const recordDocumentEvents = windowSnapshot.get('documentEvents')!;
+
+    recordAttrs.forEach((value, key) => {
+      injectKeySet.add(key);
+      microAppWindow[key] = deepCopy(value);
+    });
+
+    recordWindowEvents.forEach((arr, type) => {
+      windowEventMap.set(type as string, deepCopy(arr));
+      for (const item of arr) {
+        originalWindowAddEventListener.call(originalWindow, type as string, item.listener, item.options);
+      }
+    });
+
+    recordOnWindowEvents.forEach((func, type) => {
+      onWindowEventMap.set(type as string, func);
+      originalWindowAddEventListener.call(originalWindow, type as string, func);
+    });
+
+    const currentMap = documentEventMap.get(this.appName);
+    recordDocumentEvents.forEach((arr, type) => {
+      currentMap?.set(type as string, deepCopy(arr));
+      for (const item of arr) {
+        originalDocumentAddEventListener.call(originalDocument, type as string, item.listener, item.options);
+      }
+    });
   }
 
   // 劫持 window 属性

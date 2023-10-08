@@ -1,6 +1,7 @@
-import { isPromise } from "src/utils/utils";
-import { AnyObject, Application, AppStatus } from "../types";
-import parseHTMLandLoadSources from "src/utils/parseHtmlAndLoadSources";
+import Sandbox from '../sandbox/Sandbox';
+import { isPromise } from 'src/utils/utils';
+import { AnyObject, Application, AppStatus } from '../types';
+import parseHTMLandLoadSources from 'src/utils/source';
 
 declare const window: any;
 
@@ -8,14 +9,14 @@ export default async function bootstrapApp(app: Application) {
   try {
     await parseHTMLandLoadSources(app);
   } catch (error) {
-    throw error
+    throw error;
   }
 
   const { bootstrap, mount, unMount } = await getLifeCycleFuncs(app.name);
 
-  validateLifeCycleFunc("bootstrap", bootstrap);
-  validateLifeCycleFunc("mount", mount);
-  validateLifeCycleFunc("unMount", unMount);
+  validateLifeCycleFunc('bootstrap', bootstrap);
+  validateLifeCycleFunc('mount', mount);
+  validateLifeCycleFunc('unMount', unMount);
 
   app.bootstrap = bootstrap;
   app.mount = mount;
@@ -44,21 +45,21 @@ export default async function bootstrapApp(app: Application) {
 }
 
 async function getProps(props: Function | AnyObject) {
-  if (typeof props === "function") {
+  if (typeof props === 'function') {
     return await props();
   }
-  if (typeof props === "object") return props;
+  if (typeof props === 'object') return props;
   return {};
 }
 
 function validateLifeCycleFunc(name: string, fn: any) {
-  if (typeof fn !== "function") {
+  if (typeof fn !== 'function') {
     throw Error(`The "${name}" must be a function`);
   }
 }
 
 async function getLifeCycleFuncs(name: string) {
-  const result = window[`mini-single-spa-${name}`]
+  const result = window[`mini-single-spa-${name}`];
   if (typeof result === 'function') {
     return result();
   }
@@ -67,5 +68,7 @@ async function getLifeCycleFuncs(name: string) {
     return result;
   }
 
-  throw Error(`The micro app must inject the lifecycle("bootstrap" "mount" "unmount") into window['mini-single-spa-${name}']`)
+  throw Error(
+    `The micro app must inject the lifecycle("bootstrap" "mount" "unmount") into window['mini-single-spa-${name}']`,
+  );
 }

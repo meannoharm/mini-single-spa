@@ -1,5 +1,6 @@
 import { Application, Source } from 'src/types';
 import { createElement, removeNode } from './dom';
+import { isFunction } from './utils';
 
 const urlReg = /^http(s)?:\/\//;
 function isCorrectURL(url = '') {
@@ -44,7 +45,7 @@ export default function parseHTMLandLoadSources(app: Application) {
     Promise.all(loadScripts(scripts))
       .then((data) => {
         isScriptsDone = true;
-        executeScripts(data);
+        executeScripts(data, app);
         if (isScriptsDone && isStylesDone) {
           resolve(app);
         }
@@ -74,7 +75,7 @@ function extractScriptsAndStyle(node: Document | Element, app: Application) {
     } else if (tagName === 'SCRIPT') {
       removeNode(child);
       const src = child.getAttribute('src') || '';
-      console.log(child)
+      console.log(child);
       if (app.loadedURLs.includes(src) || globalLoadedURLs.includes(src)) {
         continue;
       }
@@ -140,58 +141,75 @@ export function loadSourceText(url: string) {
 const head = document.head;
 function loadStyles(styles: Source[]) {
   if (!styles.length) return [];
-  return styles.map((item) => {
-    if (item.isGlobal) {
-      if (item.url) {
-        const link = createElement('link', {
-          global: item.isGlobal,
-          href: item.url,
-          ref: 'stylesheet',
-        });
+  return styles
+    .map((item) => {
+      if (item.isGlobal) {
+        if (item.url) {
+          const link = createElement('link', {
+            global: item.isGlobal,
+            href: item.url,
+            ref: 'stylesheet',
+          });
 
-        head.appendChild(link);
-      } else {
-        const style = createElement('style', {
-          global: item.isGlobal,
-          type: 'text/css',
-          innerContent: item.value,
-        });
+          head.appendChild(link);
+        } else {
+          const style = createElement('style', {
+            global: item.isGlobal,
+            type: 'text/css',
+            innerContent: item.value,
+          });
 
-        head.appendChild(style);
+          head.appendChild(style);
+        }
       }
-    }
-    if (item.url) return loadSourceText(item.url);
-    return Promise.resolve(item.value)
-  }).filter(Boolean);
+      if (item.url) return loadSourceText(item.url);
+      return Promise.resolve(item.value);
+    })
+    .filter(Boolean);
 }
 
 function loadScripts(scripts: Source[]) {
   if (!scripts.length) return [];
-  return scripts.map((item) => {
-    const type = item.type || 'text/javascript';
-    if (item.isGlobal) {
-      const script = createElement('script', {
-        type,
-        global: item.isGlobal,
-      })
+  return scripts
+    .map((item) => {
+      const type = item.type || 'text/javascript';
+      if (item.isGlobal) {
+        const script = createElement('script', {
+          type,
+          global: item.isGlobal,
+        });
 
-      if (item.url) {
-        script.setAttribute('src', item.url);
-      } else {
-        script.textContent = item.value;
+        if (item.url) {
+          script.setAttribute('src', item.url);
+        } else {
+          script.textContent = item.value;
+        }
+
+        head.appendChild(script);
       }
-
-      head.appendChild(script);
-    }
-    if (item.url) return loadSourceText(item.url);
-    return Promise.resolve(item.value)
-  }).filter(Boolean);
+      if (item.url) return loadSourceText(item.url);
+      return Promise.resolve(item.value);
+    })
+    .filter(Boolean);
 }
 
-export function executeScripts(scripts: string[]) {
+export function executeScripts(scripts: string[], app: Application) {
   try {
     scripts.forEach((code) => {
-      new Function('window', code).call(window, window);
+      if (isFunction(app.loader)) {
+        // @ts-ignore
+        code = app.loader(code);
+      }
+
+      const warpCode = `
+        ;(function(proxyWindow) {
+          with(proxyWindow) {
+            (function(window){${code}\n}).call(proxyWindow, proxyWindow)
+          }
+        })(this);
+      `;
+
+      new Function(warpCode).call(app.sandbox.proxyWindow);
     });
   } catch (error) {
     throw error;
@@ -210,4 +228,14 @@ export function addStyles(styles: string[] | HTMLStyleElement[]) {
       document.head.appendChild(item);
     }
   });
+}
+
+export async function fetchStyleAndReplaceStyleContent(style: Node, url: string) {
+  const content = await loadSourceText(url);
+  style.textContent = content;
+}
+
+export async function fetchScriptAndExecute(url: string, app: Application) {
+  const content = await loadSourceText(url);
+  executeScripts([content], app);
 }
