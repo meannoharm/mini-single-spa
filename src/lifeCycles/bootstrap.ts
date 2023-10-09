@@ -1,24 +1,33 @@
 import Sandbox from '../sandbox/Sandbox';
-import { isPromise } from 'src/utils/utils';
+import { isFunction, isObject } from 'src/utils/utils';
 import { AnyObject, Application, AppStatus } from '../types';
-import parseHTMLandLoadSources from 'src/utils/source';
+import parseHTMLandLoadSources, { addStyles, executeScripts } from 'src/utils/source';
+import { triggerAppHook } from '../utils/application';
 
 declare const window: any;
 
 export default async function bootstrapApp(app: Application) {
+  triggerAppHook(app, 'beforeBootstrap', AppStatus.BEFORE_BOOTSTRAP);
+
   try {
+    // 加载页面的 script css
     await parseHTMLandLoadSources(app);
   } catch (error) {
     throw error;
   }
 
-  const { bootstrap, mount, unMount } = await getLifeCycleFuncs(app.name);
+  app.sandbox = new Sandbox(app);
+  app.sandbox.start();
+  app.container.innerHTML = app.pageBody;
 
-  validateLifeCycleFunc('bootstrap', bootstrap);
+  addStyles(app.styles);
+  executeScripts(app.scripts, app);
+
+  const { mount, unMount } = await getLifeCycleFuncs(app);
+
   validateLifeCycleFunc('mount', mount);
   validateLifeCycleFunc('unMount', unMount);
 
-  app.bootstrap = bootstrap;
   app.mount = mount;
   app.unMount = unMount;
 
@@ -29,19 +38,10 @@ export default async function bootstrapApp(app: Application) {
     console.log(err);
   }
 
-  let result = (app as any).bootstrap(app.props);
-  if (!isPromise(result)) {
-    result = Promise.resolve(result);
-  }
+  app.scripts.length = 0;
+  app.sandbox.recordWindowSnapshot();
 
-  return result
-    .then(() => {
-      app.status = AppStatus.BOOTSTRAPPED;
-    })
-    .catch((err: Error) => {
-      app.status = AppStatus.BOOTSTRAP_ERROR;
-      console.log(err);
-    });
+  triggerAppHook(app, 'bootstrapped', AppStatus.BOOTSTRAPPED);
 }
 
 async function getProps(props: Function | AnyObject) {
@@ -58,13 +58,13 @@ function validateLifeCycleFunc(name: string, fn: any) {
   }
 }
 
-async function getLifeCycleFuncs(name: string) {
-  const result = window[`mini-single-spa-${name}`];
-  if (typeof result === 'function') {
+async function getLifeCycleFuncs(app: Application) {
+  const result = app.sandbox.proxyWindow.__IS_SINGLE_SPA__;
+  if (isFunction(result)) {
     return result();
   }
 
-  if (typeof result === 'object') {
+  if (isObject(result)) {
     return result;
   }
 

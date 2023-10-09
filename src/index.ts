@@ -1,6 +1,6 @@
-import overwriteEventsAndHistory from "./navigation/overwriteEventsAndHistory";
-export { default as registerApplication } from "./application/registerApplication";
-export { default as start } from "./start";
+import overwriteEventsAndHistory from './utils/overwriteEventsAndHistory';
+export { default as registerApplication } from './application/registerApplication';
+export { default as start } from './start';
 
 declare const window: any;
 

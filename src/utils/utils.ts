@@ -11,3 +11,7 @@ export function nextTick(callback: () => void) {
 export function isFunction(fn: any) {
   return typeof fn === 'function';
 }
+
+export function isObject(obj: any) {
+  return typeof obj === 'object' && obj !== null;
+}
