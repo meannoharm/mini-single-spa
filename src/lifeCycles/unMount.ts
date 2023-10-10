@@ -1,17 +1,17 @@
-import { isPromise } from "src/utils/utils";
-import { Application, AppStatus } from "src/types";
+import { removeStyles } from 'src/utils/dom';
+import { Application, AppStatus } from 'src/types';
+import { triggerAppHook } from 'src/utils/application';
 
 export default function unMountApp(app: Application): Promise<any> {
-  app.status = AppStatus.BEFORE_UNMOUNT;
+  triggerAppHook(app, 'beforeUnMount', AppStatus.BEFORE_UNMOUNT);
 
-  let result = (app as any).unMount({props: app.props, container: app.container});
-  if (!isPromise(result)) {
-    result = Promise.resolve(result);
-  }
+  let result = (app as any).unMount({ props: app.props, container: app.container });
 
-  return result
+  return Promise.resolve(result)
     .then(() => {
-      app.status = AppStatus.UNMOUNTED;
+      app.sandbox.stop();
+      app.styles = removeStyles(app.name);
+      triggerAppHook(app, 'unMounted', AppStatus.UNMOUNTED);
     })
     .catch((err: any) => {
       app.status = AppStatus.UNMOUNT_ERROR;

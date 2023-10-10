@@ -101,11 +101,11 @@ export interface Application {
   /**
    * app 生命周期钩子，卸载前触发
    */
-  beforeUmount?: () => void;
+  beforeUnMount?: () => void;
   /**
    * app 生命周期钩子，卸载后触发
    */
-  unmounted?: () => void;
+  unMounted?: () => void;
   /**
    * js 代码的 loader，每次获取到 js 代码后会传给 loader() 并将返回值作为新的代码
    */

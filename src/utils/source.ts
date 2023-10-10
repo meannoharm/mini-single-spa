@@ -7,7 +7,7 @@ function isCorrectURL(url = '') {
   return urlReg.test(url);
 }
 
-export default function parseHTMLandLoadSources(app: Application) {
+export function parseHTMLandLoadSources(app: Application) {
   return new Promise(async (resolve, reject) => {
     const pageEntry = app.pageEntry;
     if (!isCorrectURL(pageEntry)) {
@@ -33,7 +33,7 @@ export default function parseHTMLandLoadSources(app: Application) {
     Promise.all(loadStyles(styles))
       .then((data) => {
         isStylesDone = true;
-        addStyles(data);
+        app.styles = data;
         if (isScriptsDone && isStylesDone) {
           resolve(app);
         }
@@ -45,7 +45,7 @@ export default function parseHTMLandLoadSources(app: Application) {
     Promise.all(loadScripts(scripts))
       .then((data) => {
         isScriptsDone = true;
-        executeScripts(data, app);
+        app.scripts = data;
         if (isScriptsDone && isStylesDone) {
           resolve(app);
         }
@@ -75,7 +75,6 @@ function extractScriptsAndStyle(node: Document | Element, app: Application) {
     } else if (tagName === 'SCRIPT') {
       removeNode(child);
       const src = child.getAttribute('src') || '';
-      console.log(child);
       if (app.loadedURLs.includes(src) || globalLoadedURLs.includes(src)) {
         continue;
       }
@@ -214,20 +213,6 @@ export function executeScripts(scripts: string[], app: Application) {
   } catch (error) {
     throw error;
   }
-}
-
-export function addStyles(styles: string[] | HTMLStyleElement[]) {
-  styles.forEach((item) => {
-    if (typeof item === 'string') {
-      const node = createElement('style', {
-        type: 'text/css',
-        innerContent: item,
-      });
-      document.head.appendChild(node);
-    } else {
-      document.head.appendChild(item);
-    }
-  });
 }
 
 export async function fetchStyleAndReplaceStyleContent(style: Node, url: string) {

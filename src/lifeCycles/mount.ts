@@ -1,21 +1,27 @@
-import { isPromise } from "src/utils/utils";
-import { Application, AppStatus } from "../types";
+import { isPromise } from 'src/utils/utils';
+import { Application, AppStatus } from '../types';
+import { triggerAppHook } from 'src/utils/application';
 
 export default function mountApp(app: Application): Promise<any> {
-  app.status = AppStatus.BEFORE_MOUNT;
-  app.container.innerHTML = app.pageBody;
+  triggerAppHook(app, 'beforeMount', AppStatus.BEFORE_MOUNT);
 
-  let result = (app as any).mount({props: app.props, container: app.container});
-  if (!isPromise(result)) {
-    result = Promise.resolve(result);
+  if (!app.isFirstLoad) {
+    // 重新加载子应用时恢复快照
+    app.sandbox.restoreWindowSnapshot();
+    app.sandbox.start();
+    app.container.innerHTML = app.pageBody;
+  } else {
+    app.isFirstLoad = false;
   }
 
-  return result
+  const result = (app as any).mount({ props: app.props, container: app.container });
+
+  return Promise.resolve(result)
     .then(() => {
-      app.status = AppStatus.MOUNTED;
+      triggerAppHook(app, 'mounted', AppStatus.MOUNTED);
     })
-    .catch((err: Error) => {
+    .catch((err: any) => {
       app.status = AppStatus.MOUNT_ERROR;
-      throw err;
+      console.log(err);
     });
 }

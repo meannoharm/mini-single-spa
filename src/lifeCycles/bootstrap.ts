@@ -1,8 +1,9 @@
 import Sandbox from '../sandbox/Sandbox';
 import { isFunction, isObject } from 'src/utils/utils';
 import { AnyObject, Application, AppStatus } from '../types';
-import parseHTMLandLoadSources, { addStyles, executeScripts } from 'src/utils/source';
+import { parseHTMLandLoadSources, executeScripts } from 'src/utils/source';
 import { triggerAppHook } from '../utils/application';
+import { addStyles } from '../utils/dom';
 
 declare const window: any;
 
@@ -39,6 +40,7 @@ export default async function bootstrapApp(app: Application) {
   }
 
   app.scripts.length = 0;
+  // 记录当前的 window 快照，重新挂载子应用时恢复
   app.sandbox.recordWindowSnapshot();
 
   triggerAppHook(app, 'bootstrapped', AppStatus.BOOTSTRAPPED);
@@ -59,7 +61,9 @@ function validateLifeCycleFunc(name: string, fn: any) {
 }
 
 async function getLifeCycleFuncs(app: Application) {
-  const result = app.sandbox.proxyWindow.__IS_SINGLE_SPA__;
+  console.log(app, app.sandbox);
+  const result = app.sandbox.proxyWindow.__SINGLE_SPA__;
+
   if (isFunction(result)) {
     return result();
   }

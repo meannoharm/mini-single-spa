@@ -30,3 +30,26 @@ export function getEventTypes() {
 export function isUniqueElement(key: string): boolean {
   return /^body$/i.test(key) || /^head$/i.test(key) || /^html$/i.test(key);
 }
+
+const head = document.head;
+export function addStyles(styles: string[] | HTMLStyleElement[]) {
+  styles.forEach((item) => {
+    if (typeof item === 'string') {
+      const node = createElement('style', {
+        type: 'text/css',
+        innerContent: item,
+      });
+      head.appendChild(node);
+    } else {
+      head.appendChild(item);
+    }
+  });
+}
+
+export function removeStyles(name: string) {
+  const styles = document.querySelectorAll(`style[single-spa-name=${name}]`);
+  styles.forEach((style) => {
+    removeNode(style);
+  });
+  return Array.from(styles) as HTMLStyleElement[];
+}
