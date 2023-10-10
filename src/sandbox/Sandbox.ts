@@ -49,7 +49,7 @@ export default class Sandbox {
   constructor(app: Application) {
     // 代理了 window、document 的 addEventListener 和 window.onxxx 事件
     this.windowSnapshot.set('attrs', new Map<string | symbol, any>());
-    this.windowSnapshot.set('props', new Map<string | symbol, any>());
+    this.windowSnapshot.set('windowEvents', new Map<string | symbol, any>());
     this.windowSnapshot.set('onWindowEvents', new Map<string | symbol, any>());
     this.windowSnapshot.set('documentEvents', new Map<string | symbol, any>());
 
@@ -120,7 +120,7 @@ export default class Sandbox {
   recordWindowSnapshot() {
     const { windowSnapshot, microAppWindow } = this;
     const recordAttrs = windowSnapshot.get('attrs')!;
-    const recordWindowEvents = windowSnapshot.get('onWindowEvents')!;
+    const recordWindowEvents = windowSnapshot.get('windowEvents')!;
     const recordOnWindowEvents = windowSnapshot.get('onWindowEvents')!;
     const recordDocumentEvents = windowSnapshot.get('documentEvents')!;
 
