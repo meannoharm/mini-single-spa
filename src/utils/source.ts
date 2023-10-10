@@ -106,12 +106,11 @@ function extractScriptsAndStyle(node: Document | Element, app: Application) {
           isGlobal,
           value: '',
         });
-      }
-
-      if (isGlobal) {
-        globalLoadedURLs.push(href);
-      } else {
-        app.loadedURLs.push(href);
+        if (isGlobal) {
+          globalLoadedURLs.push(href);
+        } else {
+          app.loadedURLs.push(href);
+        }
       }
     } else {
       const result = extractScriptsAndStyle(child, app);
