@@ -18,6 +18,7 @@ import {
   executeScripts,
   fetchStyleAndReplaceStyleContent,
 } from '../utils/source';
+import addCssScope from './addCSSScope';
 
 // 对document有关的方法进行代理
 // 使其作用范围在子应用的dom范围内
@@ -122,6 +123,9 @@ function patchAddChild(parent: Node, child: any, referenceNode: Node | null, typ
     // if (app.sandboxConfig.css) {
 
     // }
+    if (app.sandbox.css) {
+      addCssScope(child, app);
+    }
     return addChild(head, child, referenceNode, type);
   }
 
@@ -155,7 +159,7 @@ function patchAddChild(parent: Node, child: any, referenceNode: Node | null, typ
     const style = document.createElement('link');
     style.setAttribute('type', 'text/css');
 
-    fetchStyleAndReplaceStyleContent(style, href);
+    fetchStyleAndReplaceStyleContent(style, href, app);
 
     return addChild(head, style, referenceNode, type);
   }
