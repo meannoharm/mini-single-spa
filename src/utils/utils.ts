@@ -1,3 +1,5 @@
+import { originalDocument, originalWindow } from './originalEnv';
+
 export const isPromise = (value: any) => {
   return (typeof value === 'object' || typeof value === 'function') && typeof value.then === 'function';
 };
@@ -14,4 +16,8 @@ export function isFunction(fn: any) {
 
 export function isObject(obj: any) {
   return typeof obj === 'object' && obj !== null;
+}
+
+export function isInBrowser() {
+  return typeof originalWindow === 'object' && typeof originalDocument === 'object';
 }

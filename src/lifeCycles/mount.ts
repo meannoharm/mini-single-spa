@@ -1,15 +1,19 @@
-import { isPromise } from 'src/utils/utils';
 import { Application, AppStatus } from '../types';
 import { triggerAppHook } from 'src/utils/application';
+import { addStyles } from 'src/utils/dom';
 
 export default function mountApp(app: Application): Promise<any> {
   triggerAppHook(app, 'beforeMount', AppStatus.BEFORE_MOUNT);
+  app.container.setAttribute('single-spa-name', app.name);
 
   if (!app.isFirstLoad) {
-    // 重新加载子应用时恢复快照
-    app.sandbox.restoreWindowSnapshot();
-    app.sandbox.start();
+    if (app.sandboxConfig.enabled) {
+      // 重新加载子应用时恢复快照
+      app.sandbox.restoreWindowSnapshot();
+      app.sandbox.start();
+    }
     app.container.innerHTML = app.pageBody;
+    addStyles(app.styles);
   } else {
     app.isFirstLoad = false;
   }

@@ -28,7 +28,6 @@ function handleCssRules(cssRules: CSSRuleList, app: Application) {
   Array.from(cssRules).forEach((cssRule) => {
     result += handleCssRUleHelper(cssRule as CSSStyleRule, app);
   });
-
   return result;
 }
 
@@ -53,6 +52,7 @@ function handleCssRUleHelper(cssRule: CSSRule, app: Application) {
   } else {
     result += cssText;
   }
+  return result;
 }
 
 function modifyCssText(cssRule: CSSStyleRule, app: Application) {

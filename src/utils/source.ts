@@ -1,6 +1,8 @@
 import { Application, Source } from 'src/types';
 import { createElement, removeNode } from './dom';
 import { isFunction } from './utils';
+import { originalWindow } from './originalEnv';
+import addCssScope from 'src/sandbox/addCssScope';
 
 const urlReg = /^http(s)?:\/\//;
 function isCorrectURL(url = '') {
@@ -198,8 +200,8 @@ export function executeScripts(scripts: string[], app: Application) {
         // @ts-ignore
         code = app.loader(code);
       }
-
-      const warpCode = `
+      if (app.sandboxConfig.enabled) {
+        const warpCode = `
         ;(function(proxyWindow) {
           with(proxyWindow) {
             (function(window){${code}\n}).call(proxyWindow, proxyWindow)
@@ -207,16 +209,22 @@ export function executeScripts(scripts: string[], app: Application) {
         })(this);
       `;
 
-      new Function(warpCode).call(app.sandbox.proxyWindow);
+        new Function(warpCode).call(app.sandbox.proxyWindow);
+      } else {
+        new Function('window', code).call(originalWindow, originalWindow);
+      }
     });
   } catch (error) {
     throw error;
   }
 }
 
-export async function fetchStyleAndReplaceStyleContent(style: Node, url: string) {
+export async function fetchStyleAndReplaceStyleContent(style: HTMLStyleElement, url: string, app: Application) {
   const content = await loadSourceText(url);
   style.textContent = content;
+  if (app.sandboxConfig.css) {
+    addCssScope(style, app);
+  }
 }
 
 export async function fetchScriptAndExecute(url: string, app: Application) {

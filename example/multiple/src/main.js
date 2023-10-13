@@ -45,19 +45,19 @@ if (window.__IS_SINGLE_SPA__) {
   };
 
   window.addEventListener('click', () => {
-    console.log('window click: vue');
+    console.log('window click: multi');
   });
 
   window.onclick = () => {
-    console.log('window onclick: vue');
+    console.log('window onclick: multi');
   };
 
   document.addEventListener('click', () => {
-    console.log('document click: vue');
+    console.log('document click: multi');
   });
 
   document.onclick = () => {
-    console.log('document onclick: vue');
+    console.log('document onclick: multi');
   };
 
   setTimeout(() => {
@@ -67,4 +67,4 @@ if (window.__IS_SINGLE_SPA__) {
   render();
 }
 
-window.name = 'vue';
+window.name = 'multi';

@@ -18,7 +18,7 @@ import {
   executeScripts,
   fetchStyleAndReplaceStyleContent,
 } from '../utils/source';
-import addCssScope from './addCSSScope';
+import addCssScope from './addCssScope';
 
 // 对document有关的方法进行代理
 // 使其作用范围在子应用的dom范围内
@@ -120,10 +120,7 @@ function patchAddChild(parent: Node, child: any, referenceNode: Node | null, typ
   if (!appName || !app) return addChild(parent, child, referenceNode, type);
 
   if (tagName === 'STYLE') {
-    // if (app.sandboxConfig.css) {
-
-    // }
-    if (app.sandbox.css) {
+    if (app.sandboxConfig.css) {
       addCssScope(child, app);
     }
     return addChild(head, child, referenceNode, type);

@@ -9,7 +9,9 @@ export default function unMountApp(app: Application): Promise<any> {
 
   return Promise.resolve(result)
     .then(() => {
-      app.sandbox.stop();
+      if (app.sandboxConfig.enabled) {
+        app.sandbox.stop();
+      }
       app.styles = removeStyles(app.name);
       triggerAppHook(app, 'unMounted', AppStatus.UNMOUNTED);
     })

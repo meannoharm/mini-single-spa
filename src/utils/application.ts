@@ -36,3 +36,7 @@ export function triggerAppHook<K extends keyof Application>(app: Application, ho
     app[hook]();
   }
 }
+
+export function isSandboxEnable(app: Application) {
+  return app.sandboxConfig.enabled;
+}
