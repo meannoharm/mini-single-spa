@@ -18,7 +18,7 @@ export default function registerApplication(app: Application) {
   };
 
   if (!app.sandboxConfig) {
-    app.sandboxConfig = { enabled: true, css: true };
+    app.sandboxConfig = { enabled: true, css: false };
   }
 
   appMaps.set(app.name, app);

@@ -6,8 +6,6 @@ import { isSandboxEnable, triggerAppHook } from '../utils/application';
 import { addStyles } from '../utils/dom';
 import { originalWindow } from 'src/utils/originalEnv';
 
-declare const window: any;
-
 export default async function bootstrapApp(app: Application) {
   triggerAppHook(app, 'beforeBootstrap', AppStatus.BEFORE_BOOTSTRAP);
 

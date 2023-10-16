@@ -60,6 +60,8 @@ if (window.__IS_SINGLE_SPA__) {
   setTimeout(() => {
     console.log('setTimeout');
   }, 3000);
+
+  console.log('vue querySelect: ', document.querySelector('div'));
 } else {
   render();
 }

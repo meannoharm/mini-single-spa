@@ -50,12 +50,21 @@ registerApplication({
     console.log('vue loader');
     return code;
   },
+  sandboxConfig: {
+    enabled: true,
+    css: true,
+  },
 });
+
 registerApplication({
   name: 'react',
   pageEntry: 'http://localhost:8002',
   activeRule: (location) => location.pathname.indexOf('/react') === 0 || location.pathname.indexOf('/multiple') === 0,
   container: $('#subapp-viewport'),
+  sandboxConfig: {
+    enabled: true,
+    css: true,
+  },
 });
 
 registerApplication({
@@ -63,6 +72,10 @@ registerApplication({
   pageEntry: 'http://localhost:8003',
   activeRule: pathPrefix('/multiple'),
   container: $('#multiple-app'),
+  sandboxConfig: {
+    enabled: true,
+    css: true,
+  },
 });
 
 start();

@@ -1,7 +1,7 @@
 import { Application, Source } from 'src/types';
 import { createElement, removeNode } from './dom';
 import { isFunction } from './utils';
-import { originalWindow } from './originalEnv';
+import { originalWindow, originalAppendChild } from './originalEnv';
 import addCssScope from 'src/sandbox/addCssScope';
 
 const urlReg = /^http(s)?:\/\//;
@@ -150,16 +150,14 @@ function loadStyles(styles: Source[]) {
             href: item.url,
             ref: 'stylesheet',
           });
-
-          head.appendChild(link);
+          originalAppendChild.call(head, link);
         } else {
           const style = createElement('style', {
             global: item.isGlobal,
             type: 'text/css',
             innerContent: item.value,
           });
-
-          head.appendChild(style);
+          originalAppendChild.call(head, style);
         }
       }
       if (item.url) return loadSourceText(item.url);
