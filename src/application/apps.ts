@@ -1,4 +1,4 @@
-import { appMaps } from 'src/utils/application';
+import { appMaps, isActive } from 'src/utils/application';
 import bootstrapApp from '../lifeCycles/bootstrap';
 import mountApp from '../lifeCycles/mount';
 import unMountApp from '../lifeCycles/unMount';
@@ -39,7 +39,3 @@ export function getAppsWithStatus(status: AppStatus) {
   });
   return result;
 }
-
-const isActive = (app: Application) => {
-  return typeof app.activeRule === 'function' && app.activeRule(window.location);
-};

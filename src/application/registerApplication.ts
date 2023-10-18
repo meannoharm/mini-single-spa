@@ -1,7 +1,7 @@
-import { AppStatus, Application } from 'src/types';
+import { AppStatus, Application, ApplicationInit } from 'src/types';
 import { appMaps } from 'src/utils/application';
 
-export default function registerApplication(app: Application) {
+export default function registerApplication(app: ApplicationInit) {
   if (typeof app.activeRule === 'string') {
     const path = app.activeRule;
     app.activeRule = (location: Location = window.location) => location.pathname === path;
@@ -15,7 +15,7 @@ export default function registerApplication(app: Application) {
     scripts: [],
     styles: [],
     isFirstLoad: true,
-  };
+  } as Application;
 
   if (!app.sandboxConfig) {
     app.sandboxConfig = { enabled: true, css: false };

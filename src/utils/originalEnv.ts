@@ -1,8 +1,11 @@
+import GlobalState from 'src/globalState/GlobalState';
+
 export const originalPushState = window.history.pushState;
 export const originalReplaceState = window.history.replaceState;
 export const originalDocument = document;
 export const originalWindow = window as unknown as Window & {
   __SINGLE_SPA__: any;
+  spaGlobalState: GlobalState;
 };
 export const originalWindowAddEventListener = window.addEventListener;
 export const originalWindowRemoveEventListener = window.removeEventListener;
