@@ -82,4 +82,9 @@ start();
 window.name = 'parent';
 console.log(window.name);
 
+console.log(window.name);
+
+window.spaGlobalState.on('vue', () => alert('父应用监听到 vue 子应用发送了一个全局事件: vue'));
+window.spaGlobalState.on('multiple', () => alert('父应用监听到 multiple 子应用发送了一个全局事件: multiple'));
+
 start();
