@@ -8,7 +8,17 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts,.d.ts src/",
     "build": "rimraf dist && rollup -c rollup.config.js --environment NODE_ENV:production",
-    "dev": "rimraf dist && rollup -c rollup.config.js --environment NODE_ENV:development"
+    "dev": "rimraf dist && rollup -c rollup.config.js --environment NODE_ENV:development",
+    "install:main": "cd example/main && pnpm i --frozen-lockfile",
+    "install:react": "cd example/react && pnpm i --frozen-lockfile",
+    "install:vue": "cd example/vue && pnpm i --frozen-lockfile",
+    "install:multiple": "cd example/multiple && pnpm i --frozen-lockfile",
+    "install:all": "run-p install:main install:react install:vue install:multiple",
+    "dev:main": "cd example/main && pnpm dev",
+    "dev:react": "cd example/react && pnpm dev",
+    "dev:vue": "cd example/vue && pnpm dev",
+    "dev:multiple": "cd example/multiple && pnpm dev",
+    "dev:all": "run-p dev dev:react dev:vue dev:multiple dev:main"
   },
   "lint-staged": {
     "src/**/*.{js,ts}": "eslint"
@@ -33,6 +43,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "husky": "^4.3.0",
     "lint-staged": "^10.5.4",
+    "npm-run-all": "^4.1.5",
     "prettier": "^3.0.3",
     "rimraf": "^3.0.2",
     "rollup": "^2.64.0",
