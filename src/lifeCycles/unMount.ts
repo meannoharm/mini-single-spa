@@ -1,6 +1,7 @@
 import { removeStyles } from 'src/utils/dom';
 import { Application, AppStatus } from 'src/types';
 import { triggerAppHook } from 'src/utils/application';
+import { originalWindow } from 'src/utils/originalEnv';
 
 export default function unMountApp(app: Application): Promise<any> {
   triggerAppHook(app, 'beforeUnMount', AppStatus.BEFORE_UNMOUNT);
@@ -13,6 +14,7 @@ export default function unMountApp(app: Application): Promise<any> {
         app.sandbox.stop();
       }
       app.styles = removeStyles(app.name);
+      originalWindow.spaGlobalState.clearGlobalStateByAppName(app.name);
       triggerAppHook(app, 'unMounted', AppStatus.UNMOUNTED);
     })
     .catch((err: any) => {

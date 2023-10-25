@@ -24,7 +24,7 @@ export default class EventBus {
     if (!events[event]) {
       events[event] = [];
     }
-
+    console.log(events, event);
     events[event].push(callback);
   }
 
@@ -55,12 +55,11 @@ export default class EventBus {
     // 所以需要改成用 activeRule 来判断当前子应用是否运行
     this.eventsMap.forEach((events, appName) => {
       const app = getApp(appName);
-      if (app) {
-        if (appName === 'parent' || (isActive(app) && app.status === AppStatus.MOUNTED)) {
-          if (events[event].length) {
-            for (const callback of events[event]) {
-              callback.apply(this, args);
-            }
+      console.log(events, event, appName, app);
+      if (appName === 'parent' || (app && isActive(app) && app.status === AppStatus.MOUNTED)) {
+        if (events[event]?.length) {
+          for (const callback of events[event]) {
+            callback.apply(this, args);
           }
         }
       }
