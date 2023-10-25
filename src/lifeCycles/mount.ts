@@ -1,5 +1,5 @@
 import { Application, AppStatus } from '../types';
-import { triggerAppHook } from 'src/utils/application';
+import { isSandboxEnable, triggerAppHook } from 'src/utils/application';
 import { addStyles } from 'src/utils/dom';
 
 export default function mountApp(app: Application): Promise<any> {
@@ -7,7 +7,7 @@ export default function mountApp(app: Application): Promise<any> {
   app.container.setAttribute('single-spa-name', app.name);
 
   if (!app.isFirstLoad) {
-    if (app.sandboxConfig.enabled) {
+    if (isSandboxEnable(app)) {
       // 重新加载子应用时恢复快照
       app.sandbox.restoreWindowSnapshot();
       app.sandbox.start();

@@ -1,5 +1,5 @@
 import { AnyObject } from 'src/types';
-import { originalWindow } from 'src/utils/originalEnv';
+import { originalAppendChild, originalWindow } from 'src/utils/originalEnv';
 
 export function createElement(tag: string, attrs?: AnyObject) {
   const node = document.createElement(tag);
@@ -39,9 +39,9 @@ export function addStyles(styles: string[] | HTMLStyleElement[]) {
         type: 'text/css',
         innerContent: item,
       });
-      head.appendChild(node);
+      originalAppendChild.call(head, node);
     } else {
-      head.appendChild(item);
+      originalAppendChild.call(head, item);
     }
   });
 }

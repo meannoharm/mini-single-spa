@@ -13,6 +13,7 @@ export default async function bootstrapApp(app: Application) {
     // 加载页面的 script css
     await parseHTMLandLoadSources(app);
   } catch (error) {
+    app.status = AppStatus.BOOTSTRAP_ERROR;
     throw error;
   }
 
@@ -37,7 +38,7 @@ export default async function bootstrapApp(app: Application) {
     app.props = await getProps(app.props);
   } catch (err) {
     app.status = AppStatus.BOOTSTRAP_ERROR;
-    console.log(err);
+    throw err;
   }
 
   app.scripts.length = 0;

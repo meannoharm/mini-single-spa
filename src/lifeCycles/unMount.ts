@@ -1,16 +1,14 @@
 import { removeStyles } from 'src/utils/dom';
 import { Application, AppStatus } from 'src/types';
-import { triggerAppHook } from 'src/utils/application';
+import { isSandboxEnable, triggerAppHook } from 'src/utils/application';
 import { originalWindow } from 'src/utils/originalEnv';
 
 export default function unMountApp(app: Application): Promise<any> {
   triggerAppHook(app, 'beforeUnMount', AppStatus.BEFORE_UNMOUNT);
-
-  let result = (app as any).unMount({ props: app.props, container: app.container });
-
+  const result = (app as any).unMount({ props: app.props, container: app.container });
   return Promise.resolve(result)
     .then(() => {
-      if (app.sandboxConfig.enabled) {
+      if (isSandboxEnable(app)) {
         app.sandbox.stop();
       }
       app.styles = removeStyles(app.name);
