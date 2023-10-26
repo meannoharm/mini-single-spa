@@ -17,6 +17,6 @@ export default function unMountApp(app: Application): Promise<any> {
     })
     .catch((err: any) => {
       app.status = AppStatus.UNMOUNT_ERROR;
-      console.log(err);
+      throw err;
     });
 }

@@ -60,8 +60,8 @@ export default class Sandbox {
 
   start() {
     if (this.active) return;
-
     this.active = true;
+
     if (++Sandbox.activeCount === 1) {
       patchDocument();
       patchDocumentEvents();
@@ -70,6 +70,7 @@ export default class Sandbox {
 
   stop() {
     if (!this.active) return;
+    this.active = false;
 
     const { injectKeySet, microAppWindow, timeoutSet, intervalSet, idleSet, windowEventMap, onWindowEventMap } = this;
 
